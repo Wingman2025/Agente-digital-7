@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agente Caribe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <img src="assets/logo.svg" alt="Logo Agente Caribe">
+      <span>Agente Caribe</span>
+    </div>
+    <nav>
+      <a href="#ejemplos">Ejemplos</a>
+      <a href="#testimonios">Testimonios</a>
+      <button class="btn-prueba">Prueba inicial</button>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Asesora, vende<br>y resuelve por ti</h1>
+        <p class="sub">Transforma tu negocio con agentes digitales que automatizan tus procesos</p>
+      </div>
+      <div class="hero-img">
+        <img src="assets/ilustracion.svg" alt="Agente digital" />
+      </div>
+    </section>
+    <section class="beneficios">
+      <h2>Convierte desafíos<br>en éxitos</h2>
+      <ul>
+        <li><span class="check">✔</span> Brinda un servicio al cliente excepcional y transforma clientes potenciales en ventas</li>
+        <li><span class="check">✔</span> Un agente que conoce completamente tu negocio sabe cómo se puede ofrecer</li>
+        <li><span class="check">✔</span> Automatiza tareas repetitivas y libérate para enfocarte en crecer</li>
+      </ul>
+    </section>
+  </main>
+<script type="module">
+  import CRMChatWidget from './chat-widget.js';
+  new CRMChatWidget();
+</script>
+</body>
+</html>

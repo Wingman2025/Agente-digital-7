@@ -1,0 +1,233 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(180deg, #1ccfcf 60%, #ffd23f 40%);
+  color: #1a1a1a;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 40px;
+  background: transparent;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #ff9f1c;
+}
+.logo img {
+  width: 42px;
+  margin-right: 10px;
+}
+nav a {
+  margin: 0 16px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+.btn-prueba {
+  background: #ff9f1c;
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 24px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-left: 18px;
+  transition: background .2s;
+}
+.btn-prueba:hover {
+  background: #ffb84d;
+}
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px 40px 30px 40px;
+  background: linear-gradient(120deg, #1ccfcf 60%, #ffd23f 40%);
+}
+.hero-text {
+  max-width: 540px;
+}
+.hero-text h1 {
+  font-size: 3rem;
+  color: #ff9f1c;
+  margin-bottom: 18px;
+  font-weight: bold;
+}
+.hero-text .sub {
+  font-size: 1.4rem;
+  color: #fff;
+  margin-bottom: 0;
+}
+.hero-img img {
+  width: 320px;
+  max-width: 100%;
+}
+.beneficios {
+  background: #ffd23f;
+  border-radius: 36px 36px 0 0;
+  margin-top: -40px;
+  padding: 48px 40px 64px 40px;
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.06);
+}
+.beneficios h2 {
+  font-size: 2.2rem;
+  color: #1a1a1a;
+  margin-bottom: 26px;
+}
+.beneficios ul {
+  list-style: none;
+  padding: 0;
+}
+.beneficios li {
+  font-size: 1.2rem;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+}
+.check {
+  color: #1ccfcf;
+  font-size: 1.6rem;
+  margin-right: 12px;
+  font-weight: bold;
+}
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 10px 20px 10px;
+  }
+  .hero-img {
+    margin-top: 32px;
+  }
+  .beneficios {
+    padding: 32px 10px 48px 10px;
+  }
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 10px;
+  }
+}
+
+/* --- CRM Chat Widget --- */
+.crm-chat-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: #ff9f1c;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 16px 28px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  cursor: pointer;
+  z-index: 1000;
+  transition: background 0.2s;
+}
+.crm-chat-btn:hover {
+  background: #ffb84d;
+}
+.crm-chat-box {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 340px;
+  max-width: 95vw;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.17);
+  overflow: hidden;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+}
+.crm-chat-header {
+  background: linear-gradient(90deg, #1ccfcf 60%, #ffd23f 100%);
+  color: #22324c;
+  font-weight: bold;
+  padding: 16px 20px;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.crm-chat-header .close {
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: #ff9f1c;
+}
+.crm-chat-messages {
+  flex: 1;
+  padding: 16px 18px;
+  background: #f9fafb;
+  overflow-y: auto;
+  max-height: 260px;
+}
+.msg {
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  max-width: 80%;
+  word-break: break-word;
+  font-size: 1rem;
+}
+.msg.user {
+  background: #1ccfcf;
+  color: #fff;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+.msg.agent {
+  background: #ffd23f;
+  color: #22324c;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+.crm-chat-form {
+  display: flex;
+  border-top: 1px solid #eee;
+  padding: 12px 10px;
+  background: #fff;
+}
+.crm-chat-form input {
+  flex: 1;
+  border: none;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  margin-right: 10px;
+  background: #f2f2f2;
+}
+.crm-chat-form button {
+  background: #1ccfcf;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 10px 18px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.crm-chat-form button:hover {
+  background: #ff9f1c;
+}
+@media (max-width: 600px) {
+  .crm-chat-box, .crm-chat-btn {
+    right: 8px;
+    bottom: 8px;
+  }
+  .crm-chat-box {
+    width: 98vw;
+    min-width: 0;
+  }
+}
