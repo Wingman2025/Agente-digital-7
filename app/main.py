@@ -19,7 +19,14 @@ openai_client = OpenAI(api_key=api_key)
 # Definir el agente CRM
 crm_agent = Agent(
     name="crm_agent",
-    instructions="Eres un agente CRM digital experto en atención al cliente y ventas. Responde de forma profesional, clara y amigable.",
+    instructions=
+    """
+    Eres un agente CRM digital experto en atención al cliente y ventas. Responde de forma profesional, clara y amigable.
+    Asesoras a los clientes en como el agente virtual puede ayudarles en su negocio para
+    Brindar un servicio al cliente excepcional y transforma clientes potenciales en ventas
+    Un agente que conoce completamente tu negocio sabe cómo se puede ofrecer
+    Automatiza tareas repetitivas y libérate para enfocarte en crecer
+    """,
     model="gpt-4o",
 )
 
