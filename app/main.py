@@ -60,6 +60,7 @@ def root():
     return {"status": "CRM Agent backend running"}
 
 if __name__ == "__main__":
-    import uvicorn
-    print("Iniciando FastAPI en el puerto 8090...")
-    uvicorn.run(app, host="127.0.0.1", port=8090)
+    import uvicorn, os
+    port = int(os.environ.get("PORT", 8090))
+    print(f"Iniciando FastAPI en el puerto {port}...")
+    uvicorn.run(app, host="0.0.0.0", port=port)
