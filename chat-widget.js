@@ -9,6 +9,11 @@ class CRMChatWidget {
       buttonText: '💬 Habla con tu agente CRM',
     }, options);
     this.init();
+    // Session ID para historial compartido
+    this.sessionId = localStorage.getItem('crm_session_id') || crypto.randomUUID();
+    localStorage.setItem('crm_session_id', this.sessionId);
+    // Carga historial del servidor
+    this.loadServerHistory();
   }
 
   init() {
@@ -69,15 +74,12 @@ class CRMChatWidget {
     this.messages.scrollTop = this.messages.scrollHeight;
     try {
       console.log('Enviando mensaje al backend CRM:', text);
-      // Determina la URL del backend de forma flexible
-      const BACKEND_URL = window.BACKEND_URL ||
-        ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-          ? "http://localhost:8090/crm-agent"
-          : "/crm-agent");
-      const resp = await fetch(BACKEND_URL, {
+      // Enviar con session_id y URL base del backend
+      const base = this.getBackendBase();
+      const resp = await fetch(`${base}/crm-agent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({ session_id: this.sessionId, message: text })
       });
       console.log('Status de respuesta:', resp.status);
       const data = await resp.json();
@@ -88,6 +90,25 @@ class CRMChatWidget {
       console.error('Error al conectar con el agente CRM:', e);
       loadingMsg.remove();
       this.addMessage('Error al conectar con el agente CRM.', 'agent');
+    }
+  }
+
+  // Devuelve la URL base del backend
+  getBackendBase() {
+    return window.BACKEND_URL ||
+      ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+        ? 'http://localhost:8090'
+        : '');
+  }
+
+  // Carga el historial desde el servidor
+  async loadServerHistory() {
+    try {
+      const resp = await fetch(`${this.getBackendBase()}/history/${this.sessionId}`);
+      const { messages } = await resp.json();
+      messages.forEach(m => this.addMessage(m.text, m.type));
+    } catch (e) {
+      console.error('Error cargando historial:', e);
     }
   }
 
