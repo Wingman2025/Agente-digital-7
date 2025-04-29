@@ -1,0 +1,3 @@
+# Railway/Nixpacks start command for FastAPI
+[start]
+command = "python app/main.py"
