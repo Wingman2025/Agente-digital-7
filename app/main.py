@@ -8,10 +8,13 @@ from agents import Agent, Runner
 import os
 from fastapi.staticfiles import StaticFiles
 import pathlib
+import asyncio
+import psycopg2
 
 # Cargar variables de entorno (.env)
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Crear cliente OpenAI con API Key
 openai_client = OpenAI(api_key=api_key)
@@ -38,6 +41,90 @@ runner = Runner()
 # Inicializar la aplicación FastAPI
 app = FastAPI()
 
+# Modelo de datos para el request (mensaje del usuario)
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
+
+# Modelo de datos para el historial de conversaciones
+class HistoryEntry(BaseModel):
+    sender: str
+    message: str
+
+# Endpoint para obtener el historial de conversaciones
+@app.get("/history/{session_id}")
+async def get_history(session_id: str):
+    def _fetch():
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT sender, message FROM conversations WHERE session_id=%s ORDER BY ts",
+            (session_id,)
+        )
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return rows
+    rows = await asyncio.to_thread(_fetch)
+    return {"messages": [{"type": r[0], "text": r[1]} for r in rows]}
+
+# Endpoint para agregar un nuevo mensaje al historial de conversaciones
+@app.post("/history/{session_id}")
+async def post_history(session_id: str, entry: HistoryEntry):
+    def _insert():
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO conversations (session_id, sender, message) VALUES (%s,%s,%s)",
+            (session_id, entry.sender, entry.message)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+    await asyncio.to_thread(_insert)
+    return {"status": "ok"}
+
+# Evento de inicio para crear la tabla de conversaciones
+@app.on_event("startup")
+def ensure_conversations_table():
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS conversations (
+            id SERIAL PRIMARY KEY,
+            session_id TEXT NOT NULL,
+            sender TEXT NOT NULL,
+            message TEXT NOT NULL,
+            ts TIMESTAMP DEFAULT NOW()
+        );
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+# Endpoint principal para interactuar con el agente CRM
+@app.post("/crm-agent")
+async def crm_agent_endpoint(req: ChatRequest):
+    # Guarda mensaje de usuario
+    await post_history(req.session_id, HistoryEntry(sender="user", message=req.message))
+    # Ejecuta el agente CRM
+    response = await runner.run(crm_agent, input=req.message)
+    reply = response.final_output
+    # Guarda respuesta del agente
+    await post_history(req.session_id, HistoryEntry(sender="agent", message=reply))
+    return {"reply": reply}
+
+# Endpoint de depuración para inspeccionar RunResult
+@app.post("/crm-agent-debug")
+async def crm_agent_debug(req: ChatRequest):
+    resp = await runner.run(crm_agent, input=req.message)
+    return {"attributes": dir(resp), "state": resp.__dict__}
+
+# Ruta de verificación para saber si la API está viva
+@app.get("/health")
+def health():
+    return {"status": "CRM Agent backend running"}
+
 # Configurar CORS para permitir acceso desde el frontend
 app.add_middleware(
     CORSMiddleware,
@@ -46,29 +133,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Modelo de datos para el request (mensaje del usuario)
-class ChatRequest(BaseModel):
-    message: str
-
-# Endpoint principal para interactuar con el agente CRM
-@app.post("/crm-agent")
-async def crm_agent_endpoint(req: ChatRequest):
-    # Ejecuta el agente con el mensaje del usuario y devuelve su respuesta
-    response = await runner.run(crm_agent, input=req.message)
-    return {"reply": response.final_output}
-
-# Endpoint de depuración para inspeccionar RunResult
-@app.post("/crm-agent-debug")
-async def crm_agent_debug(req: ChatRequest):
-    resp = await runner.run(crm_agent, input=req.message)
-    # Devuelve los atributos y estado interno del objeto RunResult
-    return {"attributes": dir(resp), "state": resp.__dict__}
-
-# Ruta de verificación para saber si la API está viva
-@app.get("/health")
-def health():
-    return {"status": "CRM Agent backend running"}
 
 # Servir frontend estático en '/'
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
