@@ -6,7 +6,7 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
-assets/
+# eliminado 'assets/' para trackear assets estáticos
 node_modules/
 *.log
 *.db
