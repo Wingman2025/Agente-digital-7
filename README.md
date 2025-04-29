@@ -22,7 +22,12 @@ Este proyecto implementa un agente CRM digital para el home page, usando FastAPI
 - `POST /crm-agent` — Recibe mensajes del chat y responde (pronto con IA real)
 
 ## Despliegue
-- Railway recomendado (ver configuración)
+- Railway recomendado:
+  1. Conecta tu repositorio a Railway.
+  2. En Settings > Environment Variables, añade:
+     - OPENAI_API_KEY: tu clave de OpenAI
+     - DATABASE_URL: tu cadena de conexión a PostgreSQL
+  3. Railway detectará `nixpacks.toml` y ejecutará automaticamente el build/start.
 
 ## Notas
 - Integraremos pronto la conexión OpenAI Agents y PostgreSQL.
