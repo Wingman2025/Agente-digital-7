@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from agents import Agent, Runner
 import os
+from fastapi.staticfiles import StaticFiles
+import pathlib
 
 # Cargar variables de entorno (.env)
 load_dotenv()
@@ -55,9 +57,13 @@ async def crm_agent_debug(req: ChatRequest):
     return {"attributes": dir(resp), "state": resp.__dict__}
 
 # Ruta de verificación para saber si la API está viva
-@app.get("/")
-def root():
+@app.get("/health")
+def health():
     return {"status": "CRM Agent backend running"}
+
+# Servir frontend estático en '/'
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
+app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn, os
