@@ -77,10 +77,6 @@ class CRMChatWidget {
     this.sessionId = crypto.randomUUID();
     localStorage.setItem('crm_session_id', this.sessionId);
     this.messages.innerHTML = '';
-    // Opcional: mostrar mensaje de bienvenida
-    if (this.options.welcomeMessage) {
-      this.addMessage(this.options.welcomeMessage, 'agent');
-    }
     // No carga historial del servidor, chat vacío
   }
 
