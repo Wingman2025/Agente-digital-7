@@ -119,26 +119,14 @@ async def crm_agent_debug(req: ChatRequest):
 def health():
     return {"status": "CRM Agent backend running"}
 
-# Configurar CORS para permitir acceso desde el frontend
+# Configurar CORS para permitir acceso desde el frontend en www.agentecaribe.com
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permite cualquier origen (ideal para desarrollo)
-    allow_credentials=False,  # Deshabilita credenciales para permitir origen '*'
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["https://www.agentecaribe.com"], # Allow only your frontend domain
+    allow_credentials=True, # Allow cookies if needed in the future
+    allow_methods=["*"], # Allow all standard methods
+    allow_headers=["*"], # Allow all standard headers
 )
-
-from fastapi.responses import FileResponse
-
-# Servir archivos estáticos en /static
-BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
-STATIC_DIR = BASE_DIR / "static"
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
-
-# Servir index.html en la raíz /
-@app.get("/")
-def read_index():
-    return FileResponse(str(STATIC_DIR / "index.html"))
 
 if __name__ == "__main__":
     import uvicorn, os
