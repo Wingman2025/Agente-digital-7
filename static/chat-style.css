@@ -1,0 +1,157 @@
+/* Make sure html/body take full height */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Style for the chat button */
+.crm-chat-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  transition: background-color 0.3s ease;
+}
+
+.crm-chat-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Main chat box container */
+.crm-chat-box {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 90%; /* Adjust for mobile */
+  max-width: 370px;
+  /* Use dynamic viewport height, fallback to vh */
+  height: calc(var(--vh, 1vh) * 70); /* Use 70% of dynamic viewport height */
+  max-height: 600px; /* Max height on desktop */
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  /* Use flexbox for layout */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent content spilling */
+  z-index: 1000;
+  transition: transform 0.3s ease-out; /* Smooth opening */
+}
+
+/* Header styling */
+.crm-chat-header {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.crm-chat-header .close {
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+}
+.crm-chat-header .crm-chat-actions button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+
+/* Messages area - make it scrollable */
+.crm-chat-messages {
+  flex: 1; /* Takes up available space */
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding: 15px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Space between messages */
+}
+
+/* Individual message styling */
+.msg {
+  padding: 8px 12px;
+  border-radius: 18px;
+  max-width: 80%;
+  word-wrap: break-word; /* Prevent long words overflowing */
+}
+
+.msg.user {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end; /* Align user messages to the right */
+  border-bottom-right-radius: 5px; /* Bubble tail effect */
+}
+
+.msg.agent {
+  background-color: #e9e9eb;
+  color: #333;
+  align-self: flex-start; /* Align agent messages to the left */
+  border-bottom-left-radius: 5px; /* Bubble tail effect */
+}
+
+/* Form styling - keep it at the bottom */
+.crm-chat-form {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  background-color: #fff;
+}
+
+.crm-chat-form input {
+  flex: 1; /* Input takes remaining space */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.crm-chat-form button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.crm-chat-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 480px) {
+  .crm-chat-box {
+    width: calc(100% - 20px); /* Nearly full width */
+    max-width: none;
+    bottom: 10px;
+    right: 10px;
+    height: calc(var(--vh, 1vh) * 85); /* Take more height on mobile */
+    max-height: none;
+  }
+   .crm-chat-btn {
+    bottom: 10px;
+    right: 10px;
+  }
+}

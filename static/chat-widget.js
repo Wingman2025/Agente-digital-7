@@ -1,6 +1,17 @@
 // chat-widget.js
 // Widget de chat CRM modular y moderno
 
+// === NEW: Helper function to set viewport height unit ===
+function setViewportHeight() {
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+// Set initially and on resize/orientation change
+setViewportHeight();
+window.addEventListener('resize', setViewportHeight);
+window.addEventListener('orientationchange', setViewportHeight);
+// ======================================================
+
 class CRMChatWidget {
   constructor(options = {}) {
     this.options = Object.assign({
@@ -57,8 +68,10 @@ class CRMChatWidget {
 
   attachEvents() {
     this.chatBtn.addEventListener('click', () => {
-      this.chatBox.style.display = 'block';
+      this.chatBox.style.display = 'flex'; // Use flex display now
       this.chatBtn.style.display = 'none';
+      setViewportHeight(); // Re-calculate height unit when opening
+      this.scrollToBottom(); // Scroll down when opening
     });
     this.chatBox.querySelector('.close').addEventListener('click', () => {
       this.chatBox.style.display = 'none';
@@ -72,6 +85,18 @@ class CRMChatWidget {
     this.newChatBtn.addEventListener('click', () => {
       this.startNewChat();
     });
+
+    // === NEW: Handle keyboard on mobile input focus ===
+    this.input.addEventListener('focus', () => {
+      // Slight delay helps wait for keyboard animation on mobile
+      setTimeout(() => {
+        // Ensure the input itself is visible
+        this.input.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // Also ensure the bottom of the messages is visible
+        this.scrollToBottom();
+      }, 300);
+    });
+    // ================================================
   }
 
   startNewChat() {
@@ -111,7 +136,8 @@ class CRMChatWidget {
     } catch (e) {
       console.error('Error al conectar con el agente CRM:', e);
       loadingMsg.remove();
-      this.addMessage('Error al conectar con el agente CRM.', 'agent');
+      // Use addMessage to ensure consistent styling and scrolling
+      this.addMessage('Error: No se pudo conectar con el agente.', 'agent');
     }
   }
 
@@ -132,13 +158,26 @@ class CRMChatWidget {
     }
   }
 
+  // === NEW/MODIFIED: Add message and ensure scroll ===
   addMessage(text, type) {
-    const div = document.createElement('div');
-    div.className = `msg ${type}`;
-    // Detectar URLs y convertirlas en enlaces clicables
-    div.innerHTML = this.linkify(text);
-    this.messages.appendChild(div);
-    this.messages.scrollTop = this.messages.scrollHeight;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg ${type}`;
+    // Sanitize text slightly to prevent basic HTML injection (consider a more robust library if needed)
+    const tempDiv = document.createElement('div');
+    tempDiv.textContent = text;
+    msgDiv.innerHTML = tempDiv.innerHTML; // Use innerHTML after textContent sets it safely
+    this.messages.appendChild(msgDiv);
+    this.scrollToBottom(); // Scroll after adding any message
+  }
+
+  // === NEW: Helper method to scroll messages ===
+  scrollToBottom() {
+     // Use requestAnimationFrame for smoother scrolling after DOM updates
+     requestAnimationFrame(() => {
+        if (this.messages) { // Ensure messages element exists
+          this.messages.scrollTop = this.messages.scrollHeight;
+        }
+     });
   }
 
   // Convierte URLs en texto en enlaces HTML
@@ -163,5 +202,15 @@ class CRMChatWidget {
   }
 }
 
+// Initialize the widget after the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new CRMChatWidget({
+    agentName: 'Agente Caribe',
+    buttonText: '💬 ¿Necesitas ayuda?',
+    // welcomeMessage can be fetched or set dynamically if needed
+  });
+});
+
 // Exportar para uso con ES Modules
-export default CRMChatWidget;
+// Remove or comment out if you are not using ES modules
+// export default CRMChatWidget;
