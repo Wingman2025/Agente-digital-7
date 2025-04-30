@@ -52,66 +52,38 @@ class HistoryEntry(BaseModel):
     message: str
 
 # Endpoint para obtener el historial de conversaciones
+from app import db
+
 @app.get("/history/{session_id}")
 async def get_history(session_id: str):
-    def _fetch():
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT sender, message FROM conversations WHERE session_id=%s ORDER BY ts",
-            (session_id,)
-        )
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
-        return rows
-    rows = await asyncio.to_thread(_fetch)
+    rows = await db.fetch_history(session_id)
     return {"messages": [{"type": r[0], "text": r[1]} for r in rows]}
 
 # Endpoint para agregar un nuevo mensaje al historial de conversaciones
 @app.post("/history/{session_id}")
 async def post_history(session_id: str, entry: HistoryEntry):
-    def _insert():
-        conn = psycopg2.connect(DATABASE_URL)
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO conversations (session_id, sender, message) VALUES (%s,%s,%s)",
-            (session_id, entry.sender, entry.message)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
-    await asyncio.to_thread(_insert)
+    await db.insert_message(session_id, entry.sender, entry.message)
     return {"status": "ok"}
 
 # Evento de inicio para crear la tabla de conversaciones
 @app.on_event("startup")
 def ensure_conversations_table():
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS conversations (
-            id SERIAL PRIMARY KEY,
-            session_id TEXT NOT NULL,
-            sender TEXT NOT NULL,
-            message TEXT NOT NULL,
-            ts TIMESTAMP DEFAULT NOW()
-        );
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
+    db.ensure_conversations_table()
 
 # Endpoint principal para interactuar con el agente CRM
 @app.post("/crm-agent")
 async def crm_agent_endpoint(req: ChatRequest):
     # Guarda mensaje de usuario
-    await post_history(req.session_id, HistoryEntry(sender="user", message=req.message))
-    # Ejecuta el agente CRM
-    response = await runner.run(crm_agent, input=req.message)
+    await db.insert_message(req.session_id, "user", req.message)
+    # Recupera todo el historial para contexto
+    rows = await db.fetch_history(req.session_id)
+    # Construye el contexto concatenando los mensajes previos
+    history_context = "\n".join([f"{r[0]}: {r[1]}" for r in rows])
+    # Ejecuta el agente CRM usando todo el historial como input
+    response = await runner.run(crm_agent, input=history_context)
     reply = response.final_output
     # Guarda respuesta del agente
-    await post_history(req.session_id, HistoryEntry(sender="agent", message=reply))
+    await db.insert_message(req.session_id, "agent", reply)
     return {"reply": reply}
 
 # Endpoint de depuración para inspeccionar RunResult

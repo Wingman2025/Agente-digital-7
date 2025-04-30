@@ -1,10 +1,13 @@
 To create agents we use the new model API responses from OpenAI with the version openai-agents==0.0.13 and openai==1.76.0
 we use a modular backend version 
+We provide agents with long-term memory to enable context-aware conversations
+We separate the db logic in a db.py file
 we use the DB postgresql
 to create migrations we use un toml file with a Startcommandstart
 we create a gitignore file
 we create a readme file
 the backend will be python + fastapi
 we use postgresql for the database
-the code should be ready for local testing and for production deployment in production
-
+the code produce should be ready for local testing and for production deployment in production
+Backend must read the port from variables environment
+we use a Procfile for the web server
