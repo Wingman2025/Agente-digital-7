@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import OpenAI
-from agents import Agent, Runner, WebSearchTool
+from agents import Agent, Runner
 import os
 from fastapi.staticfiles import StaticFiles
 import pathlib
@@ -55,7 +55,6 @@ crm_agent = Agent(
 
     """,
     model="gpt-4o",
-    tools=[WebSearchTool]
 )
 
 # Instanciar el runner con el cliente OpenAI
