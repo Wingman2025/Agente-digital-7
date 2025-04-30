@@ -136,9 +136,31 @@ class CRMChatWidget {
   addMessage(text, type) {
     const div = document.createElement('div');
     div.className = `msg ${type}`;
-    div.textContent = text;
+    // Detectar URLs y convertirlas en enlaces clicables
+    div.innerHTML = this.linkify(text);
     this.messages.appendChild(div);
     this.messages.scrollTop = this.messages.scrollHeight;
+  }
+
+  // Convierte URLs en texto en enlaces HTML
+  linkify(text) {
+    // Regex para URLs (http/https)
+    return text.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+      let label = url;
+      // WhatsApp
+      if (url.startsWith('https://wa.me/')) {
+        label = 'Ir a WhatsApp';
+      } else {
+        // Mostrar solo dominio
+        try {
+          const u = new URL(url);
+          label = u.hostname + '...';
+        } catch {
+          label = url;
+        }
+      }
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+    });
   }
 }
 
