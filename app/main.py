@@ -128,9 +128,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Servir frontend estático en '/'
-BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
-app.mount("/static", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
+from fastapi.responses import FileResponse
+
+# Servir archivos estáticos en /static
+STATIC_DIR = BASE_DIR / "static"
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+# Servir index.html en la raíz /
+@app.get("/")
+def read_index():
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 if __name__ == "__main__":
     import uvicorn, os
