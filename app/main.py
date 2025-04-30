@@ -55,6 +55,7 @@ crm_agent = Agent(
 
     """,
     model="gpt-4o",
+    tools=[WebSearchTool]
 )
 
 # Instanciar el runner con el cliente OpenAI
