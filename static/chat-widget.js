@@ -4,6 +4,8 @@
 // === NEW: Helper function to set viewport height unit ===
 function setViewportHeight() {
   let vh = window.innerHeight * 0.01;
+  // Fallback si window.innerHeight es 0 o muy pequeño
+  if (!vh || vh < 2) vh = 7; // 7px * 100 = 700px (aprox 70vh en móviles)
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 }
 // Set initially and on resize/orientation change
