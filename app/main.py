@@ -50,6 +50,9 @@ crm_agent = Agent(
     - Realizan tareas automatizadas que aportan valor al negocio.
 
     No ofrecemos otro tipo de soluciones fuera de estos agentes.
+    Si el cliente desea hablar contigo directamente, ofrécele este enlace a WhatsApp:  
+    https://wa.me/34657362988?text=Hola%20quiero%20más%20info%20sobre%20vuestros%20agentes%20inteligentes
+
     """,
     model="gpt-4o",
 )
