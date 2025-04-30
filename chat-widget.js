@@ -92,13 +92,16 @@ class CRMChatWidget {
     this.messages.appendChild(loadingMsg);
     this.messages.scrollTop = this.messages.scrollHeight;
     try {
-      console.log('Enviando mensaje al backend CRM:', text);
+      // LOGS DE DEPURACIÓN
+      console.log('[CRMChatWidget] sessionId:', this.sessionId);
+      const payload = { session_id: this.sessionId, message: text };
+      console.log('[CRMChatWidget] Payload enviado al backend:', payload);
       // Enviar con session_id y URL base del backend
       const base = this.getBackendBase();
       const resp = await fetch(`${base}/crm-agent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: this.sessionId, message: text })
+        body: JSON.stringify(payload)
       });
       console.log('Status de respuesta:', resp.status);
       const data = await resp.json();
