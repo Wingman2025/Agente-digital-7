@@ -117,10 +117,13 @@ class CRMChatWidget {
 
   // Devuelve la URL base del backend
   getBackendBase() {
-    return window.BACKEND_URL ||
-      ((location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-        ? 'http://localhost:8090'
-        : '');
+    // Usa variable global o URL absoluta de backend en producción
+    if (window.BACKEND_URL) return window.BACKEND_URL;
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      return 'http://localhost:8090';
+    }
+    // Cambia esto por la URL real de tu backend FastAPI en Railway
+    return 'https://api.agentecaribe.com';
   }
 
   // Carga el historial desde el servidor

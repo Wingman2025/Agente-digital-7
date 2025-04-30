@@ -130,7 +130,7 @@ app.add_middleware(
 
 # Servir frontend estático en '/'
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
-app.mount("/", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
+app.mount("/static", StaticFiles(directory=str(BASE_DIR), html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn, os
