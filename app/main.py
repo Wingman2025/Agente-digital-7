@@ -131,6 +131,7 @@ app.add_middleware(
 from fastapi.responses import FileResponse
 
 # Servir archivos estáticos en /static
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
