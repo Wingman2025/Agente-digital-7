@@ -7,6 +7,7 @@ from openai import OpenAI
 from agents import Agent, Runner
 import os
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import pathlib
 import asyncio
 import psycopg2
@@ -62,6 +63,11 @@ runner = Runner()
 
 # Inicializar la aplicación FastAPI
 app = FastAPI()
+
+# --- Añadir montaje de archivos estáticos ---
+static_dir = pathlib.Path(__file__).parent.parent / "static"
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+# ----------------------------------------
 
 # Modelo de datos para el request (mensaje del usuario)
 class ChatRequest(BaseModel):
@@ -123,10 +129,17 @@ async def crm_agent_debug(req: ChatRequest):
 def health():
     return {"status": "CRM Agent backend running"}
 
+# --- Añadir ruta raíz para servir index.html ---
+@app.get("/")
+async def read_index():
+    index_path = static_dir / "index.html"
+    return FileResponse(index_path)
+# -------------------------------------------
+
 # Configurar CORS para permitir acceso desde el frontend en www.agentecaribe.com
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://www.agentecaribe.com"], # Allow only your frontend domain
+    allow_origins=["https://www.agentecaribe.com", "http://localhost:3000"], # Allow only your frontend domain
     allow_credentials=True, # Allow cookies if needed in the future
     allow_methods=["*"], # Allow all standard methods
     allow_headers=["*"], # Allow all standard headers
