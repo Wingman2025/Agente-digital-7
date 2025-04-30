@@ -33,7 +33,13 @@ class CRMChatWidget {
     this.chatBox = document.createElement('div');
     this.chatBox.className = 'crm-chat-box';
     this.chatBox.innerHTML = `
-      <div class="crm-chat-header">${this.options.agentName} <span class="close">×</span></div>
+      <div class="crm-chat-header">${this.options.agentName}
+        <span class="crm-chat-actions">
+          <button class="crm-clear-btn" title="Limpiar chat" type="button">🧹</button>
+          <button class="crm-newchat-btn" title="Nuevo chat" type="button">🆕</button>
+          <span class="close">×</span>
+        </span>
+      </div>
       <div class="crm-chat-messages"></div>
       <form class="crm-chat-form">
         <input type="text" placeholder="Escribe tu mensaje..." required />
@@ -45,6 +51,8 @@ class CRMChatWidget {
     this.messages = this.chatBox.querySelector('.crm-chat-messages');
     this.form = this.chatBox.querySelector('.crm-chat-form');
     this.input = this.form.querySelector('input');
+    this.clearBtn = this.chatBox.querySelector('.crm-clear-btn');
+    this.newChatBtn = this.chatBox.querySelector('.crm-newchat-btn');
   }
 
   attachEvents() {
@@ -61,6 +69,28 @@ class CRMChatWidget {
       this.sendMessage(this.input.value);
       this.input.value = '';
     });
+    this.clearBtn.addEventListener('click', () => {
+      this.clearMessages();
+    });
+    this.newChatBtn.addEventListener('click', () => {
+      this.startNewChat();
+    });
+  }
+
+  clearMessages() {
+    this.messages.innerHTML = '';
+  }
+
+  startNewChat() {
+    // Genera un nuevo session_id único y lo guarda en localStorage
+    this.sessionId = crypto.randomUUID();
+    localStorage.setItem('crm_session_id', this.sessionId);
+    this.clearMessages();
+    // Opcional: mostrar mensaje de bienvenida
+    if (this.options.welcomeMessage) {
+      this.addMessage(this.options.welcomeMessage, 'agent');
+    }
+    // No carga historial del servidor, chat vacío
   }
 
   async sendMessage(text) {
