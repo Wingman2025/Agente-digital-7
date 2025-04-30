@@ -120,10 +120,10 @@ class CRMChatWidget {
     // Usa variable global o URL absoluta de backend en producción
     if (window.BACKEND_URL) return window.BACKEND_URL;
     if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-      return 'http://localhost:8090';
+      return 'http://localhost:8090'; // Keep localhost for local testing
     }
-    // Cambia esto por la URL real de tu backend FastAPI en Railway
-    return 'https://api.agentecaribe.com';
+    // Return empty string for production to use relative paths
+    return '';
   }
 
   // Carga el historial desde el servidor
