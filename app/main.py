@@ -96,15 +96,19 @@ def ensure_conversations_table():
 # Endpoint principal para interactuar con el agente CRM
 @app.post("/crm-agent")
 async def crm_agent_endpoint(req: ChatRequest):
+    print(f"[DEBUG] /crm-agent called. Session ID: {req.session_id}, Message: {req.message}")
     # Guarda mensaje de usuario
     await db.insert_message(req.session_id, "user", req.message)
     # Recupera todo el historial para contexto
     rows = await db.fetch_history(req.session_id)
+    print(f"[DEBUG] History rows: {rows}")
     # Construye el contexto concatenando los mensajes previos
     history_context = "\n".join([f"{r[0]}: {r[1]}" for r in rows])
+    print(f"[DEBUG] History context: {history_context}")
     # Ejecuta el agente CRM usando todo el historial como input
     response = await runner.run(crm_agent, input=history_context)
     reply = response.final_output
+    print(f"[DEBUG] Agent reply: {reply}")
     # Guarda respuesta del agente
     await db.insert_message(req.session_id, "agent", reply)
     return {"reply": reply}
