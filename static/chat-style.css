@@ -147,9 +147,8 @@ html, body {
     max-width: none;
     bottom: 10px;
     right: 10px;
-    height: calc(var(--vh, 1vh) * 85);
-    min-height: 220px; /* Siempre visible, aunque falle --vh */
-    max-height: none;
+    height: 70vh; /* O una altura por defecto razonable */
+    max-height: 500px; /* O un max-height razonable */
   }
    .crm-chat-btn {
     bottom: 10px;
