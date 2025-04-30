@@ -33,7 +33,9 @@ class CRMChatWidget {
     this.chatBox = document.createElement('div');
     this.chatBox.className = 'crm-chat-box';
     this.chatBox.innerHTML = `
-      <div class="crm-chat-header">${this.options.agentName}
+      <div class="crm-chat-header">
+        <img src="assets/logo.png" alt="Logo agente" class="crm-agent-logo" style="height:32px;vertical-align:middle;margin-right:8px;">
+        ${this.options.agentName}
         <span class="crm-chat-actions">
           <button class="crm-newchat-btn" title="Nuevo chat" type="button">🆕</button>
           <span class="close">×</span>
