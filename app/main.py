@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from agents import input_guardrail, GuardrailFunctionOutput, RunContextWrapper
+from agents import input_guardrail, GuardrailFunctionOutput, RunContextWrapper, InputGuardrailTripwireTriggered
 from dotenv import load_dotenv
 from openai import OpenAI
 from agents import Agent, Runner
@@ -131,12 +131,16 @@ async def crm_agent_endpoint(req: ChatRequest):
     history_context = "\n".join([f"{r[0]}: {r[1]}" for r in rows])
     print(f"[DEBUG] History context: {history_context}")
     # Ejecuta el agente CRM usando todo el historial como input
-    response = await runner.run(crm_agent, input=history_context)
-    reply = response.final_output
-    print(f"[DEBUG] Agent reply: {reply}")
-    # Guarda respuesta del agente
-    await db.insert_message(req.session_id, "agent", reply)
-    return {"reply": reply}
+    try:
+        response = await runner.run(crm_agent, input=history_context)
+        reply = response.final_output
+        print(f"[DEBUG] Agent reply: {reply}")
+        # Guarda respuesta del agente
+        await db.insert_message(req.session_id, "agent", reply)
+        return {"reply": reply}
+    except InputGuardrailTripwireTriggered:
+        # Respuesta clara si el guardrail bloquea el input
+        return {"reply": "Mensaje bloqueado por lenguaje inapropiado."}
 
 # Endpoint de depuración para inspeccionar RunResult
 @app.post("/crm-agent-debug")
