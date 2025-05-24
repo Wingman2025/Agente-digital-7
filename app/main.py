@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from agents import input_guardrail, GuardrailFunctionOutput, RunContextWrapper
 from dotenv import load_dotenv
 from openai import OpenAI
 from agents import Agent, Runner
@@ -19,7 +20,31 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Crear cliente OpenAI con API Key
 openai_client = OpenAI(api_key=api_key)
 
-# Definir el agente CRM
+# --------- GUARDRAIL DE LENGUAJE INAPROPIADO ---------
+class GuardrailOutput(BaseModel):
+    is_inappropriate: bool
+    reasoning: str
+
+# Agente guardrail especializado
+from agents import Agent
+
+guardrail_agent = Agent(
+    name="Inappropriate Language Guardrail",
+    instructions="Valida si el mensaje contiene lenguaje inapropiado. is_inappropriate=True solo si es ofensivo. Explica en 'reasoning'.",
+    output_type=GuardrailOutput,
+    model="gpt-4o"
+)
+
+@input_guardrail
+async def inappropriate_guardrail(ctx: RunContextWrapper[None], agent: Agent, user_input: str) -> GuardrailFunctionOutput:
+    result = await Runner.run(guardrail_agent, user_input, context=ctx.context)
+    return GuardrailFunctionOutput(
+        output_info=result.final_output,
+        tripwire_triggered=result.final_output.is_inappropriate
+    )
+
+# --------- DEFINICIÓN DEL AGENTE CRM CON GUARDRAIL ---------
+# Agente CRM con guardrail de lenguaje inapropiado
 crm_agent = Agent(
     name="crm_agent",
     instructions=
@@ -55,6 +80,7 @@ crm_agent = Agent(
 
     """,
     model="gpt-4o",
+    input_guardrails=[inappropriate_guardrail],  # Guardrail de lenguaje inapropiado
 )
 
 # Instanciar el runner con el cliente OpenAI
